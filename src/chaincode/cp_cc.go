@@ -23,8 +23,8 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
-	"time"
 	"strings"
+	"time"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 )
@@ -53,7 +53,7 @@ func generateCUSIPSuffix(issueDate string, days int) (string, error) {
 }
 
 const (
-	millisPerSecond = int64(time.Second / time.Millisecond)
+	millisPerSecond     = int64(time.Second / time.Millisecond)
 	nanosPerMillisecond = int64(time.Millisecond / time.Nanosecond)
 )
 
@@ -63,13 +63,13 @@ func msToTime(ms string) (time.Time, error) {
 		return time.Time{}, err
 	}
 
-	return time.Unix(msInt / millisPerSecond,
-		(msInt % millisPerSecond) * nanosPerMillisecond), nil
+	return time.Unix(msInt/millisPerSecond,
+		(msInt%millisPerSecond)*nanosPerMillisecond), nil
 }
 
 type Owner struct {
-	Company  string    `json:"company"`
-	Quantity int      `json:"quantity"`
+	Company  string `json:"company"`
+	Quantity int    `json:"quantity"`
 }
 
 type CP struct {
@@ -85,22 +85,22 @@ type CP struct {
 }
 
 type Account struct {
-	ID          string  `json:"id"`
-	Prefix      string  `json:"prefix"`
-	CashBalance float64 `json:"cashBalance"`
+	ID          string   `json:"id"`
+	Prefix      string   `json:"prefix"`
+	CashBalance float64  `json:"cashBalance"`
 	AssetsIds   []string `json:"assetIds"`
 }
 
 type Transaction struct {
-	CUSIP       string   `json:"cusip"`
-	FromCompany string   `json:"fromCompany"`
-	ToCompany   string   `json:"toCompany"`
-	Quantity    int      `json:"quantity"`
-	Discount    float64  `json:"discount"`
+	CUSIP       string  `json:"cusip"`
+	FromCompany string  `json:"fromCompany"`
+	ToCompany   string  `json:"toCompany"`
+	Quantity    int     `json:"quantity"`
+	Discount    float64 `json:"discount"`
 }
 
 func (t *SimpleChaincode) createAccounts(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	fmt.Println("Creating accounts")
+	fmt.Println("wyq,Creating accounts")
 
 	//  				0
 	// "number of accounts to create"
@@ -128,7 +128,7 @@ func (t *SimpleChaincode) createAccounts(stub shim.ChaincodeStubInterface, args 
 			fmt.Println("error creating account" + account.ID)
 			return nil, errors.New("Error creating account " + account.ID)
 		}
-		err = stub.PutState(accountPrefix + account.ID, accountBytes)
+		err = stub.PutState(accountPrefix+account.ID, accountBytes)
 		counter++
 		fmt.Println("created account" + accountPrefix + account.ID)
 	}
@@ -139,7 +139,7 @@ func (t *SimpleChaincode) createAccounts(stub shim.ChaincodeStubInterface, args 
 }
 
 func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	fmt.Println("Creating account")
+	fmt.Println("wyq,Creating account")
 
 	// Obtain the username to associate with the account
 	if len(args) != 1 {
@@ -170,7 +170,7 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 
 			if strings.Contains(err.Error(), "unexpected end") {
 				fmt.Println("No data means existing account found for " + account.ID + ", initializing account.")
-				err = stub.PutState(accountPrefix + account.ID, accountBytes)
+				err = stub.PutState(accountPrefix+account.ID, accountBytes)
 
 				if err == nil {
 					fmt.Println("created account" + accountPrefix + account.ID)
@@ -189,7 +189,7 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 	} else {
 
 		fmt.Println("No existing account found for " + account.ID + ", initializing account.")
-		err = stub.PutState(accountPrefix + account.ID, accountBytes)
+		err = stub.PutState(accountPrefix+account.ID, accountBytes)
 
 		if err == nil {
 			fmt.Println("created account" + accountPrefix + account.ID)
@@ -204,7 +204,7 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 }
 
 func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
-	fmt.Println("Init firing. Function will be ignored: " + function)
+	fmt.Println("wyq,Init firing. Function will be ignored: " + function)
 
 	// Initialize the collection of commercial paper keys
 	fmt.Println("Initializing paper keys collection")
@@ -220,7 +220,7 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string
 }
 
 func (t *SimpleChaincode) issueCommercialPaper(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	fmt.Println("Creating commercial paper")
+	fmt.Println("wyq,Creating commercial paper")
 
 	/*		0
 		json
@@ -243,7 +243,7 @@ func (t *SimpleChaincode) issueCommercialPaper(stub shim.ChaincodeStubInterface,
 					"company": "company4",
 					"quantity": 2
 				}
-			],				
+			],
 			"issuer":"company2",
 			"issueDate":"1456161763790"  (current time in milliseconds as a string)
 
@@ -307,7 +307,7 @@ func (t *SimpleChaincode) issueCommercialPaper(stub shim.ChaincodeStubInterface,
 			fmt.Println("Error marshalling cp")
 			return nil, errors.New("Error issuing commercial paper")
 		}
-		err = stub.PutState(cpPrefix + cp.CUSIP, cpBytes)
+		err = stub.PutState(cpPrefix+cp.CUSIP, cpBytes)
 		if err != nil {
 			fmt.Println("Error issuing paper")
 			return nil, errors.New("Error issuing commercial paper")
@@ -319,12 +319,11 @@ func (t *SimpleChaincode) issueCommercialPaper(stub shim.ChaincodeStubInterface,
 			fmt.Println("Error marshalling account")
 			return nil, errors.New("Error issuing commercial paper")
 		}
-		err = stub.PutState(accountPrefix + cp.Issuer, accountBytesToWrite)
+		err = stub.PutState(accountPrefix+cp.Issuer, accountBytesToWrite)
 		if err != nil {
 			fmt.Println("Error putting state on accountBytesToWrite")
 			return nil, errors.New("Error issuing commercial paper")
 		}
-
 
 		// Update the paper keys by adding the new key
 		fmt.Println("Getting Paper Keys")
@@ -343,12 +342,12 @@ func (t *SimpleChaincode) issueCommercialPaper(stub shim.ChaincodeStubInterface,
 		fmt.Println("Appending the new key to Paper Keys")
 		foundKey := false
 		for _, key := range keys {
-			if key == cpPrefix + cp.CUSIP {
+			if key == cpPrefix+cp.CUSIP {
 				foundKey = true
 			}
 		}
 		if foundKey == false {
-			keys = append(keys, cpPrefix + cp.CUSIP)
+			keys = append(keys, cpPrefix+cp.CUSIP)
 			keysBytesToWrite, err := json.Marshal(&keys)
 			if err != nil {
 				fmt.Println("Error marshalling keys")
@@ -389,7 +388,7 @@ func (t *SimpleChaincode) issueCommercialPaper(stub shim.ChaincodeStubInterface,
 			fmt.Println("Error marshalling cp")
 			return nil, errors.New("Error issuing commercial paper")
 		}
-		err = stub.PutState(cpPrefix + cp.CUSIP, cpWriteBytes)
+		err = stub.PutState(cpPrefix+cp.CUSIP, cpWriteBytes)
 		if err != nil {
 			fmt.Println("Error issuing paper")
 			return nil, errors.New("Error issuing commercial paper")
@@ -470,10 +469,9 @@ func GetCompany(companyID string, stub shim.ChaincodeStubInterface) (Account, er
 	return company, nil
 }
 
-
 // Still working on this one
 func (t *SimpleChaincode) transferPaper(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	fmt.Println("Transferring Paper")
+	fmt.Println("wyq,Transferring Paper")
 	/*		0
 		json
 	  	{
@@ -615,7 +613,7 @@ func (t *SimpleChaincode) transferPaper(stub shim.ChaincodeStubInterface, args [
 		return nil, errors.New("Error marshalling the toCompany")
 	}
 	fmt.Println("Put state on toCompany")
-	err = stub.PutState(accountPrefix + tr.ToCompany, toCompanyBytesToWrite)
+	err = stub.PutState(accountPrefix+tr.ToCompany, toCompanyBytesToWrite)
 	if err != nil {
 		fmt.Println("Error writing the toCompany back")
 		return nil, errors.New("Error writing the toCompany back")
@@ -628,7 +626,7 @@ func (t *SimpleChaincode) transferPaper(stub shim.ChaincodeStubInterface, args [
 		return nil, errors.New("Error marshalling the fromCompany")
 	}
 	fmt.Println("Put state on fromCompany")
-	err = stub.PutState(accountPrefix + tr.FromCompany, fromCompanyBytesToWrite)
+	err = stub.PutState(accountPrefix+tr.FromCompany, fromCompanyBytesToWrite)
 	if err != nil {
 		fmt.Println("Error writing the fromCompany back")
 		return nil, errors.New("Error writing the fromCompany back")
@@ -641,7 +639,7 @@ func (t *SimpleChaincode) transferPaper(stub shim.ChaincodeStubInterface, args [
 		return nil, errors.New("Error marshalling the cp")
 	}
 	fmt.Println("Put state on CP")
-	err = stub.PutState(cpPrefix + tr.CUSIP, cpBytesToWrite)
+	err = stub.PutState(cpPrefix+tr.CUSIP, cpBytesToWrite)
 	if err != nil {
 		fmt.Println("Error writing the cp back")
 		return nil, errors.New("Error writing the cp back")
@@ -652,7 +650,7 @@ func (t *SimpleChaincode) transferPaper(stub shim.ChaincodeStubInterface, args [
 }
 
 func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
-	fmt.Println("Query running. Function: " + function)
+	fmt.Println("wyq,Query running. Function: " + function)
 
 	if function == "GetAllCPs" {
 		fmt.Println("Getting all CPs")
@@ -714,7 +712,7 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 }
 
 func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
-	fmt.Println("Invoke running. Function: " + function)
+	fmt.Println("wyq,Invoke running. Function: " + function)
 
 	if function == "issueCommercialPaper" {
 		return t.issueCommercialPaper(stub, args)
@@ -730,6 +728,7 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 }
 
 func main() {
+	fmt.Println("Test the deploy of bluemix.\n")
 	err := shim.Start(new(SimpleChaincode))
 	if err != nil {
 		fmt.Println("Error starting Simple chaincode: %s", err)
